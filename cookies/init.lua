@@ -9,24 +9,12 @@ cookies = {
     events = require("cookies.events")
 }
 
---- @type cookies.Cookie[]
+--- @type table<cookies.Cookie, boolean>
 local allCookies = { }
 
 --- @type table<string, love.Image>
 local textures = { }
 
---- @package
---- @param t table
---- @param val any
---- @return integer?
-local function tableFind(t, val)
-    for i, v in ipairs(t) do
-        if v == val then
-            return i
-        end
-    end
-    return nil
-end
 
 --- @package
 --- @param spriteComponent cookies.SpriteComponent
@@ -51,7 +39,7 @@ local function getTexture(spriteComponent)
 end
 
 
---- Bakes a Cookie from the Dough
+--- Bakes a Cookie from a select Dough file.
 --- @param doughPath string
 --- @return cookies.Cookie
 function cookies.bakeCookie(doughPath)
@@ -79,15 +67,7 @@ function cookies.bakeCookie(doughPath)
 
         --- @param self cookies.Cookie
         destroy = function (self)
-            local index = tableFind(allCookies, self)
-            if index then
-                if self.scope then
-                    self.scope:unsubscribeAll()
-                end
-                table.remove(allCookies, index)
-            else
-                print("Cookie not found.")
-            end
+            cookies.destroyCookie(self)
         end,
     }
 
@@ -109,18 +89,30 @@ function cookies.bakeCookie(doughPath)
         end
     end
 
-    table.insert(allCookies, cookie)
+    allCookies[cookie] = true
 
     return cookie
 end
 
+--- Deletes a select Cookie.
+--- @param cookie cookies.Cookie
+function cookies.destroyCookie(cookie)
+    if not allCookies[cookie] then
+        print("Cookie already in deletion or not in the scene.")
+        return
+    end
+    cookie.scope:unsubscribeAll()
+    allCookies[cookie] = nil
+end
 
+--- Emits the `"update"` event for the entirety of the system.
 --- @param dt number
 function cookies.update(dt)
     cookies.events.emit("update", dt)
 end
 
-
+--- Emits the `"draw"` event for the entirety of the system and allows
+--- some components to render.
 function cookies.draw()
     cookies.events.emit("draw")
 end
