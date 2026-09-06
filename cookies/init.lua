@@ -1,11 +1,13 @@
 -- cookieslib
 -- written by callmemo, 2026
 
--- class definitions are in cookies.defs.lua
+-- class definitions are in defs.lua
 
 
 --- @class cookies
-cookies = { }
+cookies = {
+    events = require("cookies.events")
+}
 
 --- @type cookies.Cookie[]
 local allCookies = { }
@@ -58,8 +60,9 @@ function cookies.bakeCookie(doughPath)
 
     local dough = block()
 
-    --- @type cookies.Cookie
+    --- @class cookies.Cookie
     local cookie = {
+        --- @type cookies.Transform
         transform = dough.transform or {
             x = 0,
             y = 0,
@@ -67,41 +70,31 @@ function cookies.bakeCookie(doughPath)
             sy = 1,
             r = 0
         },
+
+        --- @type table<string, cookies.Component[]>
         components = dough.components or { },
+
+        --- @type cookies.Scope
+        scope = require("cookies.scope").new(),
+
+        --- @param self cookies.Cookie
         destroy = function (self)
-            local index = tableFind(cookies, self)
+            local index = tableFind(allCookies, self)
             if index then
-                table.remove(cookies, index)
+                if self.scope then
+                    self.scope:unsubscribeAll()
+                end
+                table.remove(allCookies, index)
             else
-                warn("Cookie not found.")
+                print("Cookie not found.")
             end
-        end
+        end,
     }
 
-    table.insert(cookies, cookie)
-
-    return cookie
-end
-
-
---- @param dt number
-function cookies.update(dt)
-    for _, cookie in ipairs(cookies) do
-        if cookie.update then
-            cookie:update(dt)
-        end
-    end
-end
-
-
-function cookies.draw()
-    for _, cookie in ipairs(cookies) do
-        if cookie.draw then
-            cookie:draw()
-        elseif cookie.components.SpriteComponent then
-            for _, sprite in ipairs(cookie.components.SpriteComponent) do
-                --- @cast sprite cookies.SpriteComponent
-
+    if cookie.components.SpriteComponent then
+        for _, sprite in ipairs(cookie.components.SpriteComponent) do
+            --- @cast sprite cookies.SpriteComponent
+            cookie.scope:on("draw", function ()
                 local ox, oy = sprite.offset.x, sprite.offset.y
                 local image = getTexture(sprite)
 
@@ -112,9 +105,24 @@ function cookies.draw()
 
                 love.graphics.draw( image, cookie.transform.x, cookie.transform.y, cookie.transform.r,
                                     cookie.transform.sx, cookie.transform.sy, ox, oy )
-            end
+            end)
         end
     end
+
+    table.insert(allCookies, cookie)
+
+    return cookie
+end
+
+
+--- @param dt number
+function cookies.update(dt)
+    cookies.events.emit("update", dt)
+end
+
+
+function cookies.draw()
+    cookies.events.emit("draw")
 end
 
 

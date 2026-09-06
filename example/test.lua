@@ -7,11 +7,11 @@ return function()
     local spd = 0.5 + 2.5 * math.random() -- lua needs a random float function...
     local lifetime = 0
 
-    cookie.update = function(self, dt)
+    cookie.scope:on("update", function(dt)
         lifetime = lifetime + dt
-        self.transform.r = self.transform.r + dt * spd
+        cookie.transform.r = cookie.transform.r + dt * spd
         if lifetime > 2 then
-            self:destroy()
+            cookie:destroy()
         end
-    end
+    end)
 end

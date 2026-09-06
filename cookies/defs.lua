@@ -3,14 +3,6 @@
 ---- type checks, ect.
 
 
---- @class cookies.Cookie
---- @field update fun(self: cookies.Cookie, dt: number)?
---- @field draw fun(self: cookies.Cookie)?
---- @field destroy fun(self: cookies.Cookie) Destroys the Cookie and deletes it.
---- @field transform cookies.Transform
---- @field components table<string, cookies.Component[]>
-
-
 
 --- @class cookies.Transform
 --- @field x number
