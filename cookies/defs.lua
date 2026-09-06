@@ -1,5 +1,5 @@
 ---- This file is empty and has no real code, it is used to define classes and types
----- for the Cookies library for easy use with Lua language servers for autocomplete,
+---- for cookieslib in EmmyLua for easy use with Lua language servers for autocomplete,
 ---- type checks, ect.
 
 

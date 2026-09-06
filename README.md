@@ -1,5 +1,5 @@
-# Cookies Library Implementation
+# cookieslib, a runtime library for handling game objects in your LÖVE project
 
 ## What is cookieslib?
 
-cookieslib is the runtime implementation of Cookies GUI. You can implement it to your LÖVE2D projects seamlessly. It allows for instanciation of dough file (prefabs) you created in Cookies GUI in your game.
+cookieslib is the runtime implementation of cookiesgui. You can implement it to your LÖVE projects seamlessly. It allows for instanciation (baking) of dough files (prefabs) you created in cookiesgui in your game.
