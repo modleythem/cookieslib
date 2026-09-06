@@ -1,4 +1,4 @@
--- cookies runtime library for the cookies love2d wrapper ide
+-- cookieslib
 -- written by callmemo, 2026
 
 -- class definitions are in cookies.defs.lua
@@ -7,13 +7,11 @@
 --- @class cookies
 cookies = { }
 
-local private = {
-    --- @type cookies.Cookie[]
-    cookies = { },
+--- @type cookies.Cookie[]
+local allCookies = { }
 
-    --- @type table<string, love.Image>
-    textures = { },
-}
+--- @type table<string, love.Image>
+local textures = { }
 
 --- @package
 --- @param t table
@@ -34,11 +32,11 @@ end
 local function getTexture(spriteComponent)
     local image
     if spriteComponent.cacheTexture then
-        if not private.textures[spriteComponent.texture] then
-            private.textures[spriteComponent.texture] = love.graphics.newImage(spriteComponent.texture)
+        if not textures[spriteComponent.texture] then
+            textures[spriteComponent.texture] = love.graphics.newImage(spriteComponent.texture)
         end
 
-        image = private.textures[spriteComponent.texture]
+        image = textures[spriteComponent.texture]
     else
         if not spriteComponent.imageTexture then
             spriteComponent.imageTexture = love.graphics.newImage(spriteComponent.texture)
@@ -71,16 +69,16 @@ function cookies.bakeCookie(doughPath)
         },
         components = dough.components or { },
         destroy = function (self)
-            local index = tableFind(private.cookies, self)
+            local index = tableFind(cookies, self)
             if index then
-                table.remove(private.cookies, index)
+                table.remove(cookies, index)
             else
                 warn("Cookie not found.")
             end
         end
     }
 
-    table.insert(private.cookies, cookie)
+    table.insert(cookies, cookie)
 
     return cookie
 end
@@ -88,7 +86,7 @@ end
 
 --- @param dt number
 function cookies.update(dt)
-    for _, cookie in ipairs(private.cookies) do
+    for _, cookie in ipairs(cookies) do
         if cookie.update then
             cookie:update(dt)
         end
@@ -97,7 +95,7 @@ end
 
 
 function cookies.draw()
-    for _, cookie in ipairs(private.cookies) do
+    for _, cookie in ipairs(cookies) do
         if cookie.draw then
             cookie:draw()
         elseif cookie.components.SpriteComponent then
