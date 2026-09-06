@@ -117,5 +117,11 @@ function cookies.draw()
     cookies.events.emit("draw")
 end
 
+--- Cleans the internal texture cache. Has no effects on SpriteComponents
+--- with `cacheTexture` set to `false`.
+function cookies.clearTextureCache()
+    textures = { }
+end
+
 
 return cookies
