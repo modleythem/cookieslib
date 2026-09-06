@@ -43,10 +43,11 @@ end
 --- @param doughPath string
 --- @return cookies.Cookie
 function cookies.bakeCookie(doughPath)
-    local block = love.filesystem.load(doughPath .. ".dough.lua")
-    assert(block, "Failed to bake cookie, dough path " .. doughPath .. ".dough.lua not found.")
+    local block, err = love.filesystem.load(doughPath .. ".dough.lua")
+    assert(block, "Failed to load dough file " .. doughPath .. ".dough.lua: " .. err)
 
     local dough = block()
+    assert(type(dough) == "table", "Failed to load dough file " .. doughPath .. ".dough.lua: Dough should be a table")
 
     --- @class cookies.Cookie
     local cookie = {
