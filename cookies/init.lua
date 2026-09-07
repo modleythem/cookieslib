@@ -44,7 +44,9 @@ end
 --- @return cookies.Cookie
 function cookies.bakeCookie(doughPath)
     local block, err = love.filesystem.load(doughPath .. ".dough.lua")
-    assert(block, "Failed to load dough file " .. doughPath .. ".dough.lua: " .. err)
+    if err or not block then
+        error("Failed to load dough file " .. doughPath .. ".dough.lua: " .. err)
+    end
 
     local dough = block()
     assert(type(dough) == "table", "Failed to load dough file " .. doughPath .. ".dough.lua: Dough should be a table")
