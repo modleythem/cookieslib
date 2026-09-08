@@ -4,9 +4,8 @@ local events = require("cookies.events")
 --- multiple event listeners.
 --- @class cookies.Scope
 --- @field private unsubscribe set<function>
-local Scope = {
-    unsubscribe = {},
-}
+--- @field private __index table
+local Scope = { }
 Scope.__index = Scope
 
 --- Creates a new Scope.
@@ -20,15 +19,33 @@ end
 --- Adds an event listener to a select event, which will be tied to the Scope.
 --- @param event string The name of the event
 --- @param listener function The event listener
+--- @param ... (fun(): any)? Dependencies linked to the listener. If any of them return nil, the listener will automatically unsubscribe.
 --- @return function unsubscribe A function to unsubscribe to the event
-function Scope:on(event, listener)
-    local u = events.on(event, listener)
-    self.unsubscribe[u] = true
+function Scope:on(event, listener, ...)
+    local dependencies = { ... }
+    local l
+    local u
 
-    return function()
-        self.unsubscribe[u] = nil
-        u()
+    if #dependencies > 0 then
+        u = events.on(event, function(...)
+            for _, dep in ipairs(dependencies) do
+                if dep() == nil then
+                    events.queue(l)
+                    return
+                end
+            end
+            listener(...)
+        end)
+    else
+        u = events.on(event, listener)
     end
+
+    self.unsubscribe[u] = true
+    l = function()
+        u()
+        self.unsubscribe[u] = nil
+    end
+    return l
 end
 
 --- Unsubscribes all event listeners tied to the Scope.
