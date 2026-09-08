@@ -33,7 +33,6 @@ function events.emit(event, ...)
     local prev = ev
 
     if not evs[event] then
-        print("Event " .. event .. " doesn't exist.")
         evs[event] = { }
         ev = prev
         return

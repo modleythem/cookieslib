@@ -5,38 +5,15 @@
 
 
 --- @class cookies
-cookies = {
-    events = require("cookies.events")
-}
+cookies = { }
+
+local components = require("cookies.components")
+local events = require("cookies.events")
 
 --- @type set<cookies.Cookie>
-local allCookies = { }
-
---- @type table<string, love.Image>
-local textures = { }
+local scene = { }
 
 
---- @package
---- @param spriteComponent cookies.SpriteComponent
---- @return love.Image
-local function getTexture(spriteComponent)
-    local image
-    if spriteComponent.cacheTexture then
-        if not textures[spriteComponent.texture] then
-            textures[spriteComponent.texture] = love.graphics.newImage(spriteComponent.texture)
-        end
-
-        image = textures[spriteComponent.texture]
-    else
-        if not spriteComponent.imageTexture then
-            spriteComponent.imageTexture = love.graphics.newImage(spriteComponent.texture)
-        end
-        image = spriteComponent.imageTexture
-    end
-    assert(image, "Failed to fetch sprite: " .. spriteComponent.texture)
-
-    return image
-end
 
 
 --- Bakes a Cookie from a select Dough file.
@@ -63,7 +40,7 @@ function cookies.bakeCookie(doughPath)
         },
 
         --- @type table<string, set<cookies.Component>>
-        components = dough.components or { },
+        components = { },
 
         --- @type cookies.Scope
         scope = require("cookies.scope").new(),
@@ -74,25 +51,13 @@ function cookies.bakeCookie(doughPath)
         end,
     }
 
-    if cookie.components.SpriteComponent then
-        for _, sprite in ipairs(cookie.components.SpriteComponent) do
-            --- @cast sprite cookies.SpriteComponent
-            cookie.scope:on("draw", function ()
-                local ox, oy = sprite.offset.x, sprite.offset.y
-                local image = getTexture(sprite)
-
-                if sprite.centered then
-                    ox = ox + (image:getWidth () / 2)
-                    oy = oy + (image:getHeight() / 2)
-                end
-
-                love.graphics.draw( image, cookie.transform.x, cookie.transform.y, cookie.transform.r,
-                                    cookie.transform.sx, cookie.transform.sy, ox, oy )
-            end)
+    for className, comps in pairs(dough.components) do
+        for _, comp in ipairs(comps) do
+            components.add(cookie, comp, className)
         end
     end
 
-    allCookies[cookie] = true
+    scene[cookie] = true
 
     return cookie
 end
@@ -100,30 +65,29 @@ end
 --- Deletes a select Cookie.
 --- @param cookie cookies.Cookie
 function cookies.destroyCookie(cookie)
-    if not allCookies[cookie] then
+    if not scene[cookie] then
         print("Cookie already in deletion or not in the scene.")
         return
     end
+    for className, comps in pairs(cookie.components) do
+        for comp in pairs(comps) do
+            comp:destroy()
+        end
+    end
     cookie.scope:unsubscribeAll()
-    allCookies[cookie] = nil
+    scene[cookie] = nil
 end
 
 --- Emits the `"update"` event for the entirety of the system.
 --- @param dt number
 function cookies.update(dt)
-    cookies.events.emit("update", dt)
+    events.emit("update", dt)
 end
 
 --- Emits the `"draw"` event for the entirety of the system and allows
 --- some components to render.
 function cookies.draw()
-    cookies.events.emit("draw")
-end
-
---- Cleans the internal texture cache. Has no effects on SpriteComponents
---- with `cacheTexture` set to `false`.
-function cookies.clearTextureCache()
-    textures = { }
+    events.emit("draw")
 end
 
 

@@ -20,6 +20,7 @@
 
 --- @class cookies.Component
 --- @field className string
+--- @field cookie cookies.Cookie
 
 
 --- @class cookies.SpriteComponent : cookies.Component
