@@ -9,7 +9,7 @@ cookies = {
     events = require("cookies.events")
 }
 
---- @type table<cookies.Cookie, boolean>
+--- @type set<cookies.Cookie>
 local allCookies = { }
 
 --- @type table<string, love.Image>
@@ -62,7 +62,7 @@ function cookies.bakeCookie(doughPath)
             r = 0
         },
 
-        --- @type table<string, cookies.Component[]>
+        --- @type table<string, set<cookies.Component>>
         components = dough.components or { },
 
         --- @type cookies.Scope
@@ -75,7 +75,7 @@ function cookies.bakeCookie(doughPath)
     }
 
     if cookie.components.SpriteComponent then
-        for _, sprite in ipairs(cookie.components.SpriteComponent) do
+        for _, sprite in pairs(cookie.components.SpriteComponent) do
             --- @cast sprite cookies.SpriteComponent
             cookie.scope:on("draw", function ()
                 local ox, oy = sprite.offset.x, sprite.offset.y

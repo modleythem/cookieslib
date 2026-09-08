@@ -2,7 +2,7 @@
 --- Handles event listening throughout the system.
 local events = { }
 
---- @type table<string, table<function, boolean>>
+--- @type table<string, set<function>>
 local evs = { }
 
 --- Adds an event listener to a chosen event and returns a function to unsubscribe to

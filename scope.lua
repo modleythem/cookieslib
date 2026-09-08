@@ -3,7 +3,7 @@ local events = require("cookies.events")
 --- A Scope is an object holding a bunch of event listeners. It allows for automatic unsubscribing of
 --- multiple event listeners.
 --- @class cookies.Scope
---- @field private listeners table
+--- @field private unsubscribe set<function>
 local Scope = {
     unsubscribe = {},
 }

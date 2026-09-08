@@ -3,6 +3,8 @@
 ---- type checks, ect.
 --- @meta
 
+--- @generic T
+--- @alias set table<T, boolean>
 
 --- @class cookies.Transform
 --- @field x number
