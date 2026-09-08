@@ -1,7 +1,7 @@
 ---- This file is empty and has no real code, it is used to define classes and types
 ---- for cookieslib in EmmyLua for easy use with Lua language servers for autocomplete,
 ---- type checks, ect.
-
+--- @meta
 
 
 --- @class cookies.Transform
