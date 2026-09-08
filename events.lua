@@ -34,7 +34,6 @@ function events.emit(event, ...)
     local prev = ev
 
     if not evs[event] then
-        evs[event] = { }
         return
     end
 
@@ -46,6 +45,7 @@ function events.emit(event, ...)
 
     if queue[event] then
         for _, q in ipairs(queue[event]) do
+            ev = event
             q.fn(unpack(q.args))
         end
 
