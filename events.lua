@@ -1,5 +1,5 @@
---- @class cookies.Events
 --- Handles event listening throughout the system.
+--- @class cookies.Events
 local events = { }
 
 --- @type string?
@@ -8,9 +8,10 @@ local ev = nil
 --- @type table<string, set<function>>
 local evs = { }
 
-
 --- @type table<string, { fn: function, args: table }[]>
 local queue = { }
+
+
 
 --- Adds an event listener to a chosen event and returns a function to unsubscribe to
 --- set event at will
@@ -34,13 +35,14 @@ function events.emit(event, ...)
 
     if not evs[event] then
         evs[event] = { }
-        ev = prev
         return
     end
+
     for listener in pairs(evs[event]) do
         ev = event
         listener(...)
     end
+    ev = event
 
     if queue[event] then
         for _, q in ipairs(queue[event]) do
@@ -49,6 +51,7 @@ function events.emit(event, ...)
 
         queue[event] = nil
     end
+
     ev = prev
 end
 
