@@ -1,7 +1,5 @@
 local events = require("cookies.events")
 
---- A Scope is an object holding a bunch of event listeners. It allows for automatic unsubscribing of
---- multiple event listeners at once, and dependency management.
 --- @class cookies.Scope
 --- @field private unsubscribe set<function>
 --- @field private __index table
@@ -10,7 +8,9 @@ Scope.__index = Scope
 
 
 local scope = {}
+
 --- Creates a new Scope.
+--- 
 --- @return cookies.Scope
 function scope.new()
     return setmetatable({
@@ -19,10 +19,14 @@ function scope.new()
 end
 
 --- Adds an event listener to a select event, which will be tied to the Scope.
---- @param event string The name of the event
---- @param listener function The event listener
---- @param ... (fun(): any)? Dependencies linked to the listener. If any of them return nil, the listener will automatically unsubscribe.
---- @return function unsubscribe A function to unsubscribe to the event
+--- 
+--- If any of the dependency functions return `nil`, the listener will not run and
+--- instead automatically unsubscribe.
+--- 
+--- @param event string The name of the event.
+--- @param listener function The event listener.
+--- @param ... (fun(): any)? Functions returning dependencies linked to the listener.
+--- @return function unsubscribe A function to unsubscribe to the event.
 function Scope:on(event, listener, ...)
     local dependencies = { ... }
     local l
@@ -51,6 +55,9 @@ function Scope:on(event, listener, ...)
 end
 
 --- Unsubscribes all event listeners tied to the Scope.
+--- 
+--- You usually want to queue this function call in case an event currently running gets
+--- a listener to unsubscribe which can be problematic.
 function Scope:unsubscribeAll()
     for u in pairs(self.unsubscribe) do
         self.unsubscribe[u] = nil

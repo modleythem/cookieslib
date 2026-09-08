@@ -4,6 +4,7 @@
 -- class definitions are in defs.lua
 
 
+--- @version ALPHA_1
 --- @class cookies
 cookies = { }
 
@@ -26,11 +27,11 @@ function cookies.bakeCookie(doughPath)
     end
 
     local dough = block()
-    assert(type(dough) == "table", "Failed to load dough file " .. doughPath .. ".dough.lua: Dough should be a table")
+    assert(type(dough) == "table", "Failed to load dough file " .. doughPath ..
+        ".dough.lua: Dough should be a table")
 
     --- @class cookies.Cookie
     local cookie = {
-        --- @type cookies.Transform
         transform = dough.transform or {
             x = 0,
             y = 0,
@@ -39,10 +40,8 @@ function cookies.bakeCookie(doughPath)
             r = 0
         },
 
-        --- @type table<string, set<cookies.Component>>
         components = { },
 
-        --- @type cookies.Scope
         scope = require("cookies.scope").new(),
 
         --- @param self cookies.Cookie
@@ -63,6 +62,9 @@ function cookies.bakeCookie(doughPath)
 end
 
 --- Deletes a select Cookie.
+--- 
+--- You usually want to queue this function call in case an event currently running gets
+--- a listener to unsubscribe which can be problematic.
 --- @param cookie cookies.Cookie
 function cookies.destroyCookie(cookie)
     if not scene[cookie] then
@@ -84,8 +86,8 @@ function cookies.update(dt)
     events.emit("update", dt)
 end
 
---- Emits the `"draw"` event for the entirety of the system and allows
---- some components to render.
+--- Emits the `"draw"` event for the entirety of the system and allows some components
+--- to render.
 function cookies.draw()
     events.emit("draw")
 end

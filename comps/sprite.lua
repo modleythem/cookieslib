@@ -1,5 +1,5 @@
 
---- @type table<string, love.Image>
+--- @type dict<love.Image>
 local textures = { }
 
 require("cookies.events").on("clearTextureCache", function ()
@@ -15,19 +15,20 @@ end)
 --- @return love.Image
 local function getTexture(spriteComp)
     local image
+    local path = spriteComp.texture
     if spriteComp.cacheTexture then
-        if not textures[spriteComp.texture] then
-            textures[spriteComp.texture] = love.graphics.newImage(spriteComp.texture)
+        if not textures[path] then
+            textures[path] = love.graphics.newImage(path)
         end
 
-        image = textures[spriteComp.texture]
+        image = textures[path]
     else
         if not spriteComp.imageTexture then
-            spriteComp.imageTexture = love.graphics.newImage(spriteComp.texture)
+            spriteComp.imageTexture = love.graphics.newImage(path)
         end
         image = spriteComp.imageTexture
     end
-    assert(image, "Failed to fetch sprite: " .. spriteComp.texture)
+    assert(image, "Failed to fetch sprite: " .. path)
 
     return image
 end
@@ -45,8 +46,9 @@ return {
                 oy = oy + (image:getHeight() / 2)
             end
 
-            love.graphics.draw( image, cookie.transform.x, cookie.transform.y, cookie.transform.r,
-                                cookie.transform.sx, cookie.transform.sy, ox, oy )
+            love.graphics.draw( image, cookie.transform.x, cookie.transform.y,
+                                cookie.transform.r, cookie.transform.sx,
+                                cookie.transform.sy, ox, oy )
         end, function () return comp end)
     end,
 
